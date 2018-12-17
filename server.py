@@ -30,5 +30,5 @@ def handle_client(conn):
 
 while True:
     connection, addr = s.accept()
-    print("Connecte by:", addr)
+    print("Connected by:", addr)
     start_new_thread(handle_client, (connection,))

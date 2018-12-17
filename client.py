@@ -1,12 +1,13 @@
 import socket
 import threading
+from time import sleep
 
 LOGIC = {
     "STOP": False
 }
 
-HOST = "127.0.0.1"
-PORT =  5555
+HOST = "192.168.1.85"
+PORT =  2222
 
 print_lock = threading.Lock()
 
@@ -19,30 +20,21 @@ def send_data():
     """
     while True:
         msq = input("Say: ")
-        if msq.lower() == "quit" or msq.lower() == "q":
-            LOGIC["STOP"] = True
-            break
         b_msq = str.encode(msq)
         s.sendall(b_msq)
-        with print_lock:
-            print(msq)
+        sleep(0.2)
+        continue
 
 def receive_data():
     """
     Receive data from server. The data is  sent by another users.
     """
     while True:
-        b_msq = s.recv(4096)
+        b_msq = s.recv(1024)
         msq = b_msq.decode()
-        if LOGIC["STOP"]:
-            break
-        with print_lock:
-            print(msq)
-
+        print("Server said:", msq)
 
 t1 = threading.Thread(target=send_data)
 t2 = threading.Thread(target=receive_data)
-t1.daemon = True
-t2.daemon = True
 t1.start()
 t2.start()
