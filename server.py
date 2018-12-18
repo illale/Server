@@ -7,7 +7,11 @@ import socket
 from _thread import start_new_thread
 import threading
 
-HOST = "192.168.1.85"
+USERS = {
+
+}
+
+HOST = "192.168.1.69"
 PORT = 2222
 
 print_lock = threading.Lock()
@@ -24,15 +28,20 @@ def handle_client(conn):
     """
     name = conn.recv(4096)
     str_name = name.decode()
+    USERS[str_name] = conn
+    while True:
+        if len(USERS) <= 1:
+            print("Waiting for more clients to connect")
+        else:
+            break
+    for name in USERS:
+        conn.sendall(name)
+    pair = conn.recv(4096)
+    str_pair = pair.decode()
+    s_conn = USERS[str_pair]
     while True:
         data = conn.recv(4096)
-        message = data.decode()
-        with print_lock:
-            print(str_name, "said: ", message)
-        if message.lower() == "quit" or message.lower() == "q":
-            print(str_name, "has left the chat")
-        msq = message.swapcase()
-        conn.sendall(str.encode(msq))
+        s_conn.sendall(data)
 
 while True:
     connection, addr = s.accept()
