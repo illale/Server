@@ -5,9 +5,12 @@ receive data from multiple users.
 """
 import socket
 from _thread import start_new_thread
+import threading
 
 HOST = "127.0.0.1"
 PORT = 5555
+
+print_lock = threading.Lock()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -21,7 +24,8 @@ def handle_client(conn):
     while True:
         data = conn.recv(4096)
         message = data.decode()
-        print("Client said: ", message)
+        with print_lock:
+            print("Client said: ", message)
         if message.lower() == "quit" or message.lower() == "q":
             print("Client has left the chat")
         msq = message.swapcase()

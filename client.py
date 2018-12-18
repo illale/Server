@@ -2,10 +2,6 @@ import socket
 import threading
 from time import sleep
 
-LOGIC = {
-    "STOP": False
-}
-
 HOST = "192.168.1.85"
 PORT =  2222
 
@@ -27,12 +23,13 @@ def send_data():
 
 def receive_data():
     """
-    Receive data from server. The data is  sent by another users.
+    Receive data from server. The data is sent by another users.
     """
     while True:
         b_msq = s.recv(1024)
         msq = b_msq.decode()
-        print("Server said:", msq)
+        with print_lock:
+            print("Server said:", msq)
 
 t1 = threading.Thread(target=send_data)
 t2 = threading.Thread(target=receive_data)
