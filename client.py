@@ -14,6 +14,8 @@ def send_data():
     """
     Sends data to server contionusly.
     """
+    name = input("Give your name: ")
+    s.sendall(str.encode(name))
     while True:
         msq = input("Say: ")
         b_msq = str.encode(msq)
