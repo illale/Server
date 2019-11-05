@@ -11,16 +11,8 @@ USERS = {
 
 }
 
-HOST = "192.168.1.69"
+HOST = "127.0.0.1"
 PORT = 2222
-
-print_lock = threading.Lock()
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind((HOST, PORT))
-s.listen(5)
-print("Waiting for a connection...")
 
 def handle_client(conn):
     """
@@ -29,6 +21,7 @@ def handle_client(conn):
     name = conn.recv(4096)
     str_name = name.decode()
     USERS[str_name] = conn
+    """
     while True:
         if len(USERS) <= 1:
             print("Waiting for more clients to connect")
@@ -36,6 +29,7 @@ def handle_client(conn):
             break
     for name in USERS:
         conn.sendall(name)
+    """
     pair = conn.recv(4096)
     str_pair = pair.decode()
     s_conn = USERS[str_pair]
@@ -43,7 +37,15 @@ def handle_client(conn):
         data = conn.recv(4096)
         s_conn.sendall(data)
 
-while True:
-    connection, addr = s.accept()
-    print("Connected by:", addr)
-    start_new_thread(handle_client, (connection,))
+if __name__ == "__main__":
+    print_lock = threading.Lock()
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((HOST, PORT))
+    s.listen(5)
+    print("Waiting for a connection...")
+    while True:
+        connection, addr = s.accept()
+        print("Connected by:", addr)
+        start_new_thread(handle_client, (connection,))
